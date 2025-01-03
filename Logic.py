@@ -36,6 +36,7 @@ table = {
     'l14': '2 4',
 }
 
+
 def bigger(sequence: str):
     sequence_split = sequence.split(' ')
 
@@ -68,6 +69,7 @@ def bigger(sequence: str):
 
     return bigger_and_second_bigger
     
+
 def see_1_in_sequence(sequence: object):
     result = {
         'max_num': 0,
@@ -99,6 +101,54 @@ def see_1_in_sequence(sequence: object):
             result['actual'] = 0
 
     result['first_max_1_position'] = result['last_max_1_position'] - result['max_num'] + 1
+    return result
+
+
+def finished(COLUMNS, LINES, result):
+    return False
+
+
+def viewing_block_position_based_on_available_space(COLUMNS, LINES, result):
+    for column in range(COLUMNS):
+        values = table[f'c{column}'].split(' ')
+        sum = 0
+
+        for num in values:
+            sum += int(num)
+
+        for i in range(len(values)):
+            val_num = int(values[i])
+            margin = 15 - (sum + len(values) - 1)
+
+            if margin < val_num:
+                sum_up = 0
+
+                for j in range(i):
+                    sum_up += int(values[j]) + 1
+
+                for j in range(val_num - margin):
+                    result[(sum_up + margin + j), column] = 1
+
+    for line in range(LINES):
+        values = table[f'l{line}'].split(' ')
+        sum = 0
+
+        for num in values:
+            sum += int(num)
+
+        for i in range(len(values)):
+            val_num = int(values[i])
+            margin = 15 - (sum + len(values) - 1)
+
+            if margin < val_num:
+                sum_left = 0
+
+                for j in range(i):
+                    sum_left += int(values[j]) + 1
+
+                for j in range(val_num - margin):
+                    result[line, (sum_left + margin + j)] = 1
+
     return result
 
 
@@ -254,59 +304,101 @@ def cutting_blocks(COLUMNS, LINES, result):
                             if internal_sequence[0] - last_sequence[0] + last_sequence[1] > result_bigger['num_bigger']:
                                 result[line][internal_sequence[0] - internal_sequence[1]] = -1
 
+                                if next_sequence == None:
+                                    for i in range(internal_sequence[0] + 1, LINES):
+                                        result[line][i] = -1
+
                         if next_sequence != None:
                             if internal_sequence[1] + next_sequence[0] - internal_sequence[0] > result_bigger['num_bigger']:
                                 result[line][internal_sequence[0] + 1] = -1
 
+                                if last_sequence == None:
+                                    for i in range(internal_sequence[0] - internal_sequence[1]+ 1):
+                                        result[line][i] = -1
+
+    for column in range(COLUMNS):
+        result_bigger = bigger(table[f'c{column}'])
+        sequence = list()
+
+        for i in range(LINES):
+            sequence.append(result[i][column])
+
+        data_sequence_of_1 = see_1_in_sequence(sequence)
+
+        all_1_sequences = list()
+        repeated_1 = 0
+
+        for i in range(len(sequence)):
+            if sequence[i] == 1:
+                repeated_1 += 1
+            elif repeated_1 > 1:
+                all_1_sequences.append([i - 1, repeated_1])
+                repeated_1 = 0
+
+        actual_line_list = table[f'c{column}'].split(' ')
+        int_actual_line_list = [int(value) for value in actual_line_list]
+        
+        for i in range(len(all_1_sequences)):
+            internal_sequence = all_1_sequences[i]
+    
+            if internal_sequence[1] == result_bigger['num_bigger']:
+                try:
+                    result[line][internal_sequence[0] - internal_sequence[1]] = -1
+                    result[line][internal_sequence[0] + 1] = -1
+                except:
+                    pass
+
+            elif len(actual_line_list) == len(all_1_sequences):
+
+                for number in int_actual_line_list:
+                    if number == internal_sequence[1]:
+                        last_sequence = None
+                        next_sequence = None
+
+                        if i > 0:
+                            last_sequence = all_1_sequences[i - 1]
+                        
+                        if i < len(all_1_sequences) - 1:
+                            next_sequence = all_1_sequences[i + 1]
+
+                        if last_sequence != None:
+                            if internal_sequence[0] - last_sequence[0] + last_sequence[1] > result_bigger['num_bigger']:
+                                result[internal_sequence[0] - internal_sequence[1]][column] = -1
+
+                                if next_sequence == None:
+                                    for i in range(internal_sequence[0] + 1, LINES):
+                                        result[i][column] = -1
+
+                        if next_sequence != None:
+                            if internal_sequence[1] + next_sequence[0] - internal_sequence[0] > result_bigger['num_bigger']:
+                                result[internal_sequence[0] + 1][column] = -1
+
+                                if last_sequence == None:
+                                    for i in range(internal_sequence[0] - internal_sequence[1]+ 1):
+                                        result[i][column] = -1
 
     return result
 
 
 def main(COLUMNS: int, LINES: int):
     result = np.zeros((LINES, COLUMNS))
+    count = 0
 
-    for column in range(COLUMNS):
-        values = table[f'c{column}'].split(' ')
-        sum = 0
+    while True:
+        past_result = result.copy()
+        result = viewing_block_position_based_on_available_space(COLUMNS, LINES, result)
+        result = joining_the_max_sequence_to_others(COLUMNS, LINES, result)
+        result = cutting_blocks(COLUMNS, LINES, result)
 
-        for num in values:
-            sum += int(num)
+        if finished(COLUMNS, LINES, result):
+            count += 1
+            print(f'The algorithm complete the puzzle in {count} loops')
+            break
+        elif np.array_equal(past_result, result):
+            print(f'The algorithm was unable to complete the puzzle in {count} loops')
+            break
 
-        for i in range(len(values)):
-            val_num = int(values[i])
-            margin = 15 - (sum + len(values) - 1)
-
-            if margin < val_num:
-                sum_up = 0
-
-                for j in range(i):
-                    sum_up += int(values[j]) + 1
-
-                for j in range(val_num - margin):
-                    result[(sum_up + margin + j), column] = 1
-
-    for line in range(LINES):
-        values = table[f'l{line}'].split(' ')
-        sum = 0
-
-        for num in values:
-            sum += int(num)
-
-        for i in range(len(values)):
-            val_num = int(values[i])
-            margin = 15 - (sum + len(values) - 1)
-
-            if margin < val_num:
-                sum_left = 0
-
-                for j in range(i):
-                    sum_left += int(values[j]) + 1
-
-                for j in range(val_num - margin):
-                    result[line, (sum_left + margin + j)] = 1
-
-    result = joining_the_max_sequence_to_others(COLUMNS, LINES, result)
-    result = cutting_blocks(COLUMNS, LINES, result)
+        count += 1
 
     return result
 
