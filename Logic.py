@@ -104,6 +104,19 @@ def see_1_in_sequence(sequence: object):
     return result
 
 
+def all_1_in_sequence(sequence: object):
+    all_1_sequences = list()
+    repeated_1 = 0
+
+    for i in range(len(sequence)):
+        if sequence[i] == 1:
+            repeated_1 += 1
+        elif repeated_1 > 1:
+            all_1_sequences.append([i - 1, repeated_1])
+            repeated_1 = 0
+
+    return all_1_sequences
+
 def finished(COLUMNS, LINES, result):
     return False
 
@@ -113,15 +126,65 @@ def viewing_block_position_based_on_available_space(COLUMNS, LINES, result):
         values = table[f'c{column}'].split(' ')
         sum = 0
 
+        line_init = None
+        line_finish = None
+
+        for i in range(LINES):
+            if result[i][column] == 0:
+                line_finish = i
+
+                if line_init == None:
+                    line_init = i
+
+        if line_init == None and line_finish == None:
+            continue
+
+        order = 0
+        order_continues = False
+
+        for i in range(LINES):
+            actual = result[i][column]
+
+            if actual == -1:
+                order_continues = False
+
+            elif actual == 1:
+                if not order_continues:
+                    values.pop(order)
+                    order += 1
+                    order_continues = True
+
+            else:
+                break
+
+        order = len(values) - 1
+        order_continues = False
+
+        for i in range(LINES, 0):
+            actual = result[i][column]
+
+            if actual == -1:
+                order_continues = False
+
+            elif actual == 1:
+                if not order_continues:
+                    values.pop(order)
+                    order -= 1
+                    order_continues = True
+
+            else:
+                break
+
         for num in values:
             sum += int(num)
 
+        margin = (line_finish - line_init + 1) - (sum + len(values) - 1)
+
         for i in range(len(values)):
             val_num = int(values[i])
-            margin = 15 - (sum + len(values) - 1)
 
             if margin < val_num:
-                sum_up = 0
+                sum_up = line_init
 
                 for j in range(i):
                     sum_up += int(values[j]) + 1
@@ -133,15 +196,65 @@ def viewing_block_position_based_on_available_space(COLUMNS, LINES, result):
         values = table[f'l{line}'].split(' ')
         sum = 0
 
+        column_init = None
+        column_finish = None
+
+        for i in range(COLUMNS):
+            if result[line][i] == 0:
+                column_finish = i
+
+                if column_init == None:
+                    column_init = i
+
+        if column_init == None and column_finish == None:
+            continue
+
+        order = 0
+        order_continues = False
+
+        for i in range(COLUMNS):
+            actual = result[line][i]
+
+            if actual == -1:
+                order_continues = False
+
+            elif actual == 1:
+                if not order_continues:
+                    values.pop(order)
+                    order += 1
+                    order_continues = True
+
+            else:
+                break
+
+        order = len(values) - 1
+        order_continues = False
+
+        for i in range(COLUMNS, 0):
+            actual = result[line][i]
+
+            if actual == -1:
+                order_continues = False
+
+            elif actual == 1:
+                if not order_continues:
+                    values.pop(order)
+                    order -= 1
+                    order_continues = True
+
+            else:
+                break
+
         for num in values:
             sum += int(num)
 
+        margin = (column_finish - column_init + 1) - (sum + len(values) - 1)
+
         for i in range(len(values)):
             val_num = int(values[i])
-            margin = 15 - (sum + len(values) - 1)
 
             if margin < val_num:
-                sum_left = 0
+                sum_left = column_init
 
                 for j in range(i):
                     sum_left += int(values[j]) + 1
@@ -264,15 +377,7 @@ def cutting_blocks(COLUMNS, LINES, result):
 
         data_sequence_of_1 = see_1_in_sequence(sequence)
 
-        all_1_sequences = list()
-        repeated_1 = 0
-
-        for i in range(len(sequence)):
-            if sequence[i] == 1:
-                repeated_1 += 1
-            elif repeated_1 > 1:
-                all_1_sequences.append([i - 1, repeated_1])
-                repeated_1 = 0
+        all_1_sequences = all_1_in_sequence(sequence)
 
         actual_line_list = table[f'l{line}'].split(' ')
         int_actual_line_list = [int(value) for value in actual_line_list]
@@ -325,15 +430,7 @@ def cutting_blocks(COLUMNS, LINES, result):
 
         data_sequence_of_1 = see_1_in_sequence(sequence)
 
-        all_1_sequences = list()
-        repeated_1 = 0
-
-        for i in range(len(sequence)):
-            if sequence[i] == 1:
-                repeated_1 += 1
-            elif repeated_1 > 1:
-                all_1_sequences.append([i - 1, repeated_1])
-                repeated_1 = 0
+        all_1_sequences = all_1_in_sequence(sequence)
 
         actual_line_list = table[f'c{column}'].split(' ')
         int_actual_line_list = [int(value) for value in actual_line_list]
