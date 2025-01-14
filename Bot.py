@@ -4,23 +4,23 @@ import time
 
 COLUMNS = 15
 LINES = 15
-SQUARE_EDGE = 50
+SCREEN_X_INIT = 600
+SCREEN_Y_INIT = 199
+SQUARE_EDGE = 35
 
 answered_table = Logic.main()
-
-for line in answered_table:
-    print(line)
 
 pyautogui.hotkey('alt', 'tab')
 time.sleep(0.1)
 
 if COLUMNS == 15 and LINES == 15:
-    x = 850
-    y = 282
+    x = SCREEN_X_INIT
+    y = SCREEN_Y_INIT
     
     for line in range(LINES):
         for column in range(COLUMNS):
-            if answered_table[line][column] == '█':
+            if answered_table[line][column] == 1:
+                print(f'line: {line} column: {column}')
                 pyautogui.moveTo(x, y)
                 time.sleep(0.15)
                 pyautogui.press('z')
@@ -28,4 +28,4 @@ if COLUMNS == 15 and LINES == 15:
             x += SQUARE_EDGE
 
         y += SQUARE_EDGE
-        x = 850
+        x = SCREEN_X_INIT
