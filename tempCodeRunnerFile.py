@@ -1,1 +1,0 @@
-print(pyautogui.position())
