@@ -3,7 +3,8 @@ import cv2
 import numpy as np
 import imutils
 
-print_image = False
+print_image_column = True
+print_image_line = True
 
 def spaces(imagem_sem_espacos):
     add = list()
@@ -45,7 +46,8 @@ def adding_spaces(imagem_para_adicionar_espacos, adicionar):
 def main(image_path: str, tesseract_path: str, 
          init_column_y: float, init_column_x: float, 
          init_line_y: float, init_line_x: float,
-         square_edge: float, window_size: tuple):
+         square_edge: float, window_size: tuple,
+         num_of_columns: int, num_of_lines: int):
 
     cols = list()
     rows = list()
@@ -63,14 +65,14 @@ def main(image_path: str, tesseract_path: str,
         x = round(init_column_x + square_edge*mult)
         w_column = round(x + square_edge)
         cut_image = image[round(init_column_y):h_column, x:w_column]
-        bigger_image = imutils.resize(cut_image, width=80)
+        bigger_image = imutils.resize(cut_image, width=90)
 
-        final_image = cv2.threshold(bigger_image, 70, 255, 0)[1]
+        final_image = cv2.threshold(bigger_image, 90, 230, 0)[1]
         
         image_string = pytesseract.image_to_string(final_image, config="--psm 6 -c tessedit_char_whitelist='0123456789 '")
         image_list = image_string.split('\n')
 
-        if print_image:
+        if print_image_column:
             print(image_list)
             cv2.imshow('coluna', final_image)
             cv2.waitKey(0)
@@ -88,8 +90,8 @@ def main(image_path: str, tesseract_path: str,
         y = round(init_line_y + square_edge * mult)
         h_line = round(y + square_edge)
         cut_image = image[y:h_line, round(init_line_x):w_line]
-        bigger_image = imutils.resize(cut_image, height=60)
-        threshold = cv2.threshold(bigger_image, 90, 255, 0)[1]
+        bigger_image = imutils.resize(cut_image, height=90)
+        threshold = cv2.threshold(bigger_image, 90, 230, 0)[1]
 
         spaces_in_image = spaces(threshold)
         final_image = adding_spaces(threshold, spaces_in_image)
@@ -97,7 +99,7 @@ def main(image_path: str, tesseract_path: str,
         image_string = pytesseract.image_to_string(final_image, config=f"--psm 7 -c tessedit_char_whitelist='0123456789 '")
         slash_n_list = image_string.split('\n')
 
-        if print_image:
+        if print_image_line:
             print(slash_n_list)
             cv2.imshow('linha', final_image)
             cv2.waitKey(0)
@@ -116,16 +118,3 @@ def main(image_path: str, tesseract_path: str,
     }
 
     return result
-
-
-if __name__ == '__main__':
-    print(
-        main(
-            image_path = '/home/schlemuel/Imagens/Capturas de tela/Captura de tela de 2025-01-09 15-12-32.png',
-            tesseract_path = r'/bin/tesseract',
-            init_column_y = 20,
-            init_column_x = 822,
-            init_line_y = 260,
-            init_line_x = 585
-        )
-    )

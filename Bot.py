@@ -1,33 +1,49 @@
 import Logic
 import pyautogui
 import time
+import os
 
-WINDOW_SIZE = pyautogui.size()
+try:
+    print('Wait the code finish before use the computer again')
+    WINDOW_SIZE = pyautogui.size()
+    COLUMNS = int(input("Number of columns: "))
+    LINES = int(input("Number of lines: "))
+    SQUARE_EDGE = 28 * (WINDOW_SIZE[0] / WINDOW_SIZE[1]) * (15/(COLUMNS if COLUMNS > LINES else LINES))
 
-COLUMNS = 15
-LINES = 15
-SCREEN_X_INIT = 0.439238653001 * WINDOW_SIZE[0]
-SCREEN_Y_INIT = 0.259114583333 * WINDOW_SIZE[1]
-SQUARE_EDGE = 19.9 * (WINDOW_SIZE[0] / WINDOW_SIZE[1])
+    time.sleep(0.2)
+    pyautogui.hotkey('alt', 'tab')
+    time.sleep(0.5)
 
-answered_table = Logic.main(WINDOW_SIZE, SQUARE_EDGE)
-print(answered_table)
+    try:
+        os.remove('./screenshot.png')
+    except:
+        pass
 
-pyautogui.hotkey('alt', 'tab')
-time.sleep(0.1)
+    pyautogui.screenshot('screenshot.png')
 
-if COLUMNS == 15 and LINES == 15:
-    x = SCREEN_X_INIT
-    y = SCREEN_Y_INIT
-    
-    for line in range(LINES):
-        for column in range(COLUMNS):
-            if answered_table[line][column] == 1:
-                pyautogui.moveTo(x, y)
-                time.sleep(0.15)
-                pyautogui.press('z')
-            
-            x += SQUARE_EDGE
+    answered_table = Logic.main(WINDOW_SIZE, SQUARE_EDGE, COLUMNS, LINES)
+    print(answered_table)
 
-        y += SQUARE_EDGE
+    if COLUMNS == 15 and LINES == 15:
+        SCREEN_X_INIT = 0.439238653001 * WINDOW_SIZE[0]
+        SCREEN_Y_INIT = 0.259114583333 * WINDOW_SIZE[1]
         x = SCREEN_X_INIT
+        y = SCREEN_Y_INIT
+        
+        for line in range(LINES):
+            for column in range(COLUMNS):
+                if answered_table[line][column] == 1:
+                    pyautogui.moveTo(x, y)
+                    time.sleep(0.15)
+                    pyautogui.press('z')
+                
+                x += SQUARE_EDGE
+
+            y += SQUARE_EDGE
+            x = SCREEN_X_INIT
+
+    pyautogui.alert(text='The code finish')
+
+except:
+    pyautogui.alert(text='Some error occurred')
+    print(f'The error was: \n {ValueError}')
