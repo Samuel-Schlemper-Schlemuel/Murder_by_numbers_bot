@@ -1,6 +1,5 @@
 # Bot for help in the game Murder by Numbers
-
-<video width="1920" height="1080" controls><source src="./BotVideo6x.mp4" type="video/mp4"></video>
+https://github.com/user-attachments/assets/0baee1ad-7bb1-40d4-a653-be30edc173b0
 
 Example video of the bot in the 6x speed
 
