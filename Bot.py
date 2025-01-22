@@ -24,26 +24,28 @@ try:
     answered_table = Logic.main(WINDOW_SIZE, SQUARE_EDGE, COLUMNS, LINES)
     print(answered_table)
 
-    if COLUMNS == 15 and LINES == 15:
-        SCREEN_X_INIT = 0.439238653001 * WINDOW_SIZE[0]
-        SCREEN_Y_INIT = 0.259114583333 * WINDOW_SIZE[1]
-        x = SCREEN_X_INIT
-        y = SCREEN_Y_INIT
-        
-        for line in range(LINES):
-            for column in range(COLUMNS):
-                if answered_table[line][column] == 1:
-                    pyautogui.moveTo(x, y)
-                    time.sleep(0.15)
-                    pyautogui.press('z')
-                
-                x += SQUARE_EDGE
+    SCREEN_BOX_X_INIT = 0.439238653001 * WINDOW_SIZE[0]
+    SCREEN_BOX_Y_INIT = 0.259114583333 * WINDOW_SIZE[1]
 
-            y += SQUARE_EDGE
-            x = SCREEN_X_INIT
+    if COLUMNS == 20 and LINES == 15:
+        SCREEN_BOX_Y_INIT = 0.342592593 * WINDOW_SIZE[1]
+    elif COLUMNS == 15 and LINES == 10:
+        SCREEN_BOX_Y_INIT = 0.373148148 * WINDOW_SIZE[1]
 
-    pyautogui.alert(text='The code finish')
+    x = SCREEN_BOX_X_INIT
+    y = SCREEN_BOX_Y_INIT
+    
+    for line in range(LINES):
+        for column in range(COLUMNS):
+            if answered_table[line][column] == 1:
+                pyautogui.moveTo(x, y)
+                time.sleep(0.15)
+                pyautogui.press('z')
+            
+            x += SQUARE_EDGE
+
+        y += SQUARE_EDGE
+        x = SCREEN_BOX_X_INIT
 
 except:
     pyautogui.alert(text='Some error occurred')
-    print(f'The error was: \n {ValueError}')
